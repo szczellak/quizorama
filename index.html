@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quizorama</title>
+  <meta name="description" content="Quizy o świecie: flagi, stolice i więcej.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://flagcdn.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Rdzeń -->
+  <script src="js/core/utils.js"></script>
+  <script src="js/core/storage.js"></script>
+  <script src="js/core/registry.js"></script>
+  <script src="js/core/engine.js"></script>
+
+  <!-- Dane -->
+  <script src="js/data/countries.js"></script>
+
+  <!-- Moduły quizów (kolejność = kolejność na ekranie głównym) -->
+  <script src="js/modules/flags.js"></script>
+  <script src="js/modules/upcoming.js"></script>
+
+  <!-- Start aplikacji -->
+  <script src="js/core/app.js"></script>
+</body>
+</html>
