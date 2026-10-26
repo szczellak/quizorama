@@ -14,6 +14,7 @@ Obrazki flag są pobierane z [flagcdn.com](https://flagcdn.com), więc potrzebny
   - **Klasyczny** — 10 / 20 / wszystkie pytania, 15 s na odpowiedź,
   - **Przetrwanie** — 3 życia, 10 s na odpowiedź,
   - **Na czas** — 60 s, błąd kosztuje 3 s.
+- W trybach Klasyczny i Przetrwanie można wyłączyć **odliczanie czasu** (bez premii za szybkość, osobne rekordy).
 - 2 sposoby odpowiedzi:
   - **4 odpowiedzi** — wybór z listy,
   - **Układanie z liter** — nazwę kraju układa się z rozsypanych liter (z kilkoma literami-pułapkami),

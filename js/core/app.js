@@ -3,6 +3,10 @@
 
   const { h, fmt, plural } = Q.utils;
   const LENGTHS = [10, 20, 0]; // 0 = wszystkie elementy z puli
+  const TIMER_CHOICES = [
+    { value: 'on', label: '⏱️ Włączone', hint: 'Szybka odpowiedź daje premię punktową.' },
+    { value: 'off', label: '🧘 Wyłączone', hint: 'Graj w swoim tempie — bez premii za szybkość, mnożnik za serię zostaje.' },
+  ];
 
   let activeGame = null;
 
@@ -18,12 +22,13 @@
   // --- Ustawienia ---
 
   function defaultSettings(module) {
-    const settings = { mode: 'classic', length: 10 };
+    const settings = { mode: 'classic', length: 10, timer: 'on' };
     for (const opt of module.options) settings[opt.key] = opt.default;
 
     const last = Q.storage.moduleStats(module.id).lastSettings || {};
     if (Q.MODES[last.mode]) settings.mode = last.mode;
     if (LENGTHS.includes(last.length)) settings.length = last.length;
+    if (TIMER_CHOICES.some((c) => c.value === last.timer)) settings.timer = last.timer;
     for (const opt of module.options) {
       if (opt.choices.some((c) => c.value === last[opt.key])) settings[opt.key] = last[opt.key];
     }
@@ -36,6 +41,7 @@
   function bestKey(module, settings) {
     const parts = [settings.mode];
     if (settings.mode === 'classic') parts.push(settings.length);
+    if (!Q.engine.isTimed(Q.MODES[settings.mode], settings)) parts.push('notimer');
     for (const opt of visibleOptions(module, settings)) parts.push(settings[opt.key]);
     return parts.join('|');
   }
@@ -132,12 +138,17 @@
           },
           h('span', { class: 'mode-icon' }, md.icon),
           h('strong', {}, md.label),
-          h('span', { class: 'mode-desc' }, Q.engine.modeDescription(md, input)))))),
+          h('span', { class: 'mode-desc' }, Q.engine.modeDescription(md, input, Q.engine.isTimed(md, settings))))))),
 
         mode.id === 'classic'
           ? group('Liczba pytań', chips(
             LENGTHS.map((v) => ({ value: v, label: v ? String(v) : `Wszystkie (${pool.length})` })),
             settings.length, (v) => update('length', v)))
+          : null,
+
+        Q.engine.hasTimerOption(mode)
+          ? group('Odliczanie czasu', chips(TIMER_CHOICES, settings.timer, (v) => update('timer', v)),
+            TIMER_CHOICES.find((c) => c.value === settings.timer).hint)
           : null,
 
         visibleOptions(m, settings).map((opt) => {
@@ -229,6 +240,7 @@
           m.name,
           `tryb ${Q.MODES[settings.mode].label.toLowerCase()}`,
           Q.engine.answerInput(m, settings) === 'letters' ? 'układanie z liter' : null,
+          Q.engine.isTimed(Q.MODES[settings.mode], settings) ? null : 'bez czasu',
         ].filter(Boolean).join(' · ')),
         h('div', { class: 'results-score' }, fmt(r.score), h('span', {}, ' pkt')),
         r.lettersBought

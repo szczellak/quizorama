@@ -3,15 +3,17 @@
 
   const { h, shuffle, fmt } = Q.utils;
 
+  const timeText = (t) => (t ? `${t} s na odpowiedź` : 'Bez limitu czasu');
+
   const MODES = {
     classic: {
       id: 'classic', label: 'Klasyczny', icon: '🎯',
-      desc: (t) => `Ustalona liczba pytań, ${t} s na odpowiedź.`,
+      desc: (t) => `Ustalona liczba pytań. ${timeText(t)}.`,
       questionTime: 15,
     },
     survival: {
       id: 'survival', label: 'Przetrwanie', icon: '💖',
-      desc: (t) => `Grasz, dopóki masz 3 życia. ${t} s na odpowiedź.`,
+      desc: (t) => `Grasz, dopóki masz 3 życia. ${timeText(t)}.`,
       questionTime: 10, lives: 3,
     },
     timeattack: {
@@ -43,8 +45,11 @@
     return Math.round((basePoints + SPEED_BONUS * speedFraction) * multiplier);
   }
 
-  const questionTime = (mode, input) => (mode.questionTime || 0) * INPUTS[input].timeFactor;
-  const modeDescription = (mode, input) => mode.desc(questionTime(mode, input));
+  // Tryb z limitem na pytanie można grać bez odliczania (settings.timer === 'off').
+  const hasTimerOption = (mode) => !!mode.questionTime;
+  const isTimed = (mode, settings) => !hasTimerOption(mode) || settings.timer !== 'off';
+  const questionTime = (mode, input, timed = true) => (timed ? (mode.questionTime || 0) * INPUTS[input].timeFactor : 0);
+  const modeDescription = (mode, input, timed) => mode.desc(questionTime(mode, input, timed));
   const answerInput = (module, settings) => (module.answerInput ? module.answerInput(settings) : 'choice');
 
   const isLetter = (ch) => /\p{L}/u.test(ch);
@@ -65,7 +70,7 @@
   function run(root, module, settings, callbacks) {
     const mode = MODES[settings.mode];
     const input = answerInput(module, settings);
-    const timeLimit = questionTime(mode, input);
+    const timeLimit = questionTime(mode, input, isTimed(mode, settings));
     const pool = module.getPool(settings);
     const total = mode.id === 'classic' ? Math.min(settings.length || pool.length, pool.length) : Infinity;
 
@@ -111,6 +116,7 @@
       questionEl));
 
     if (mode.id === 'timeattack') progressEl.replaceChildren(clockEl, hitsEl);
+    if (!mode.totalTime && !timeLimit) timerEl.hidden = true;
 
     function renderHud() {
       scoreEl.textContent = fmt(st.score);
@@ -439,7 +445,7 @@
         timerEl.classList.toggle('is-low', left < 10000);
         clockEl.textContent = `${Math.ceil(left / 1000)} s`;
         if (left <= 0) return finish();
-      } else if (!locked) {
+      } else if (!locked && timeLimit) {
         const elapsed = waitingForPrompt ? 0 : now - questionStart;
         const frac = Math.max(0, 1 - elapsed / (timeLimit * 1000));
         timerFill.style.transform = `scaleX(${frac})`;
@@ -510,5 +516,5 @@
   }
 
   Q.MODES = MODES;
-  Q.engine = { run, modeDescription, answerInput, LETTER_COST };
+  Q.engine = { run, modeDescription, answerInput, hasTimerOption, isTimed, LETTER_COST };
 })(window.Quizorama = window.Quizorama || {});
