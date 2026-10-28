@@ -17,13 +17,10 @@
     }
   }
 
-  // Minimalny helper do budowania DOM: h('div', { class: 'x', onclick: fn }, 'tekst', childNode)
-  function h(tag, attrs, ...children) {
-    const node = document.createElement(tag);
+  function build(node, attrs, children) {
     for (const [key, value] of Object.entries(attrs || {})) {
       if (value == null || value === false) continue;
-      if (key === 'class') node.className = value;
-      else if (key === 'style' && typeof value === 'object') {
+      if (key === 'style' && typeof value === 'object') {
         for (const [prop, v] of Object.entries(value)) node.style.setProperty(prop, v);
       } else if (key.startsWith('on') && typeof value === 'function') {
         node.addEventListener(key.slice(2).toLowerCase(), value);
@@ -31,6 +28,25 @@
     }
     append(node, children);
     return node;
+  }
+
+  // Minimalny helper do budowania DOM: h('div', { class: 'x', onclick: fn }, 'tekst', childNode)
+  const h = (tag, attrs, ...children) => build(document.createElement(tag), attrs, children);
+
+  // To samo dla elementów SVG: svg('svg', { viewBox }, svg('path', { d }))
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const svg = (tag, attrs, ...children) => build(document.createElementNS(SVG_NS, tag), attrs, children);
+
+  // 3 losowe odpowiedzi-pułapki: najpierw z kolejnych list priorytetowych, resztę z `all`.
+  function pickDistractors(item, all, ...priorityLists) {
+    const picked = [];
+    for (const list of [...priorityLists, all]) {
+      for (const c of shuffle(list)) {
+        if (picked.length === 3) return picked;
+        if (c !== item && !picked.includes(c)) picked.push(c);
+      }
+    }
+    return picked;
   }
 
   const numberFormat = new Intl.NumberFormat('pl-PL');
@@ -44,5 +60,5 @@
     return many;
   }
 
-  Q.utils = { shuffle, h, fmt, plural };
+  Q.utils = { shuffle, h, svg, fmt, plural, pickDistractors };
 })(window.Quizorama = window.Quizorama || {});

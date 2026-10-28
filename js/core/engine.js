@@ -115,7 +115,17 @@
       timerEl,
       questionEl));
 
-    if (mode.id === 'timeattack') progressEl.replaceChildren(clockEl, hitsEl);
+    // Elementy postępu powstają raz na grę i są tylko aktualizowane — przebudowa co odpowiedź
+    // odtwarzała od nowa animację utraconych serc (migotanie) i psuła płynne przesuwanie paska.
+    const progressFill = h('div', { class: 'progress-fill' });
+    const progressText = h('span', { class: 'progress-text' });
+    const heartsEl = h('div', { class: 'hearts' });
+    const hearts = Array.from({ length: mode.lives || 0 }, () => h('span', { class: 'heart' }, '♥'));
+    heartsEl.append(...hearts);
+
+    if (mode.id === 'classic') progressEl.replaceChildren(h('div', { class: 'progress-track' }, progressFill), progressText);
+    else if (mode.id === 'survival') progressEl.replaceChildren(heartsEl, progressText);
+    else progressEl.replaceChildren(clockEl, hitsEl);
     if (!mode.totalTime && !timeLimit) timerEl.hidden = true;
 
     function renderHud() {
@@ -125,15 +135,13 @@
 
       const number = st.answered + (locked ? 0 : 1);
       if (mode.id === 'classic') {
-        progressEl.replaceChildren(
-          h('div', { class: 'progress-track' },
-            h('div', { class: 'progress-fill', style: { width: `${(st.answered / total) * 100}%` } })),
-          h('span', { class: 'progress-text' }, `${Math.min(number, total)}/${total}`));
+        progressFill.style.width = `${(st.answered / total) * 100}%`;
+        progressText.textContent = `${Math.min(number, total)}/${total}`;
       } else if (mode.id === 'survival') {
-        progressEl.replaceChildren(
-          h('div', { class: 'hearts', 'aria-label': `Życia: ${st.lives}` },
-            Array.from({ length: mode.lives }, (_, i) => h('span', { class: i < st.lives ? 'heart' : 'heart is-lost' }, '♥'))),
-          h('span', { class: 'progress-text' }, `Pytanie ${number}`));
+        // toggle nie dodaje klasy ponownie, więc animacja utraty gra tylko raz — w chwili straty
+        hearts.forEach((el, i) => el.classList.toggle('is-lost', i >= st.lives));
+        heartsEl.setAttribute('aria-label', `Życia: ${st.lives}`);
+        progressText.textContent = `Pytanie ${number}`;
       } else {
         hitsEl.textContent = `✓ ${st.correct}`;
       }
@@ -379,16 +387,18 @@
         st.hits.push(question.id);
       } else {
         st.streak = 0;
-        st.mistakes.push({ id: question.id, answer: question.answer, note: info.note });
+        st.mistakes.push({ id: question.id, answer: question.answer, note: info.note, fact: question.fact });
         if (mode.lives) st.lives -= 1;
         if (mode.penalty) gameEndsAt -= mode.penalty * 1000;
         if (navigator.vibrate) navigator.vibrate(120);
       }
 
-      showFeedback(ok, points, info);
-      renderHud();
+      // Pauza przed kolejnym pytaniem = czas wyświetlania okienka ze stolicą.
+      // W trybie „Na czas” zegar biegnie także w pauzie, więc tam zostaje krótsza.
       const fast = mode.id === 'timeattack';
-      const delay = ok ? (fast ? 600 : 1100) : (fast ? 1400 : 2600);
+      const delay = ok ? (fast ? 600 : 1600) : (fast ? 1400 : 3100);
+      showFeedback(ok, points, info, delay);
+      renderHud();
       advanceTimer = setTimeout(advance, delay);
     }
 
@@ -412,19 +422,31 @@
       for (const btn of answerEl.querySelectorAll('button')) btn.disabled = true;
     }
 
-    function showFeedback(ok, points, info) {
+    function showFeedback(ok, points, info, duration) {
       feedbackEl.className = `feedback ${ok ? 'is-good' : 'is-bad'}`;
       const title = ok ? 'Dobrze!' : info.timedOut ? 'Czas minął!' : 'Niestety…';
       const lines = [h('span', { class: 'feedback-title' }, title)];
       if (!ok) lines.push(h('span', { class: 'feedback-answer' }, 'Poprawnie: ', h('strong', {}, question.answer)));
       if (question.detail) lines.push(h('span', { class: 'feedback-detail' }, question.detail));
       feedbackEl.replaceChildren(h('div', { class: 'feedback-text' }, lines));
+      if (question.fact) showFactPopup(ok, duration);
       if (!ok) {
         feedbackEl.appendChild(h('button', { class: 'btn btn-sm', onclick: advance }, 'Dalej ', h('kbd', {}, '↵')));
       }
 
       if (ok) popPoints(`+${points}`);
       else popPoints(mode.penalty ? `−${mode.penalty} s` : mode.lives ? '−1 ♥' : '✗', 'is-bad');
+    }
+
+    // Ciekawostka (np. stolica) wyskakuje na obrazku pytania — tam, gdzie gracz patrzy — i znika przed kolejnym.
+    function showFactPopup(ok, duration) {
+      const { fact } = question;
+      promptEl.appendChild(h('div', { class: 'fact-layer', 'aria-hidden': 'true' },
+        h('div', { class: `fact-card ${ok ? 'is-good' : 'is-bad'}`, style: { '--life': `${duration}ms` } },
+          ok ? null : h('span', { class: 'fact-answer' }, question.answer),
+          h('span', { class: 'fact-label' }, `${fact.icon || ''} ${fact.label}`.trim()),
+          h('strong', { class: 'fact-value' }, fact.value),
+          fact.note ? h('span', { class: 'fact-note' }, fact.note) : null)));
     }
 
     function advance() {

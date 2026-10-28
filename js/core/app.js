@@ -226,6 +226,7 @@
             m.renderThumb(x.id),
             h('div', {},
               h('strong', {}, x.answer),
+              x.fact ? h('span', { class: 'review-fact' }, `${x.fact.icon || ''} ${x.fact.label}: `.trimStart(), h('strong', {}, x.fact.value)) : null,
               h('span', { class: 'muted small' }, x.note))))),
         h('p', { class: 'muted small' }, m.reviewHint));
     } else if (r.answered) {

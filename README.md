@@ -1,7 +1,9 @@
 # Quizorama
 
 Przeglądarkowa aplikacja z quizami o świecie, budowana z niezależnych modułów.
-Pierwszy moduł: **Flagi świata** — rozpoznaj kraj po fladze, wybierając jedną z czterech odpowiedzi.
+Moduły:
+- **Flagi świata** — rozpoznaj kraj po fladze,
+- **Kontury państw** — rozpoznaj kraj po kształcie granic.
 
 ## Uruchomienie
 
@@ -22,7 +24,9 @@ Obrazki flag są pobierane z [flagcdn.com](https://flagcdn.com), więc potrzebny
     Za zdobyte punkty można odkrywać losowe litery (30 pkt za literę, ostatnią trzeba odgadnąć samodzielnie).
 - Punktacja: 100 pkt (układanie z liter: 200 pkt) + do 50 pkt za szybkość, mnożnik za serię trafień (do ×1,9).
 - Flagi: 197 państw, filtr regionu, poziom łatwy / trudny (trudny = podobne flagi i sąsiedzi).
-- Pula **„Moje błędy”**: pomylone flagi wracają do powtórki, trafienia zdejmują je z listy.
+- Kontury: 170 państw (mikropaństwa i rozproszone archipelagi są pominięte), poziom łatwy = kontur + mini-mapa
+  świata z zaznaczonym położeniem, trudny = sam kontur, a odpowiedzi to sąsiedzi kraju.
+- Pula **„Moje błędy”** (osobna w każdym module): pomylone kraje wracają do powtórki, trafienia zdejmują je z listy.
 - Rekordy dla każdej kombinacji ustawień i statystyki zapisywane w `localStorage`.
 - Sterowanie klawiaturą: `1`–`4` wybór odpowiedzi, `Enter` dalej, `Esc` wyjście.
 - Jasny i ciemny motyw (wg ustawień systemu), układ dostosowany do telefonu.
@@ -38,7 +42,10 @@ js/core/registry.js   rejestr modułów + opis interfejsu modułu
 js/core/engine.js     silnik quizu: tryby, timer, punktacja, HUD
 js/core/app.js        ekrany: menu, ustawienia, gra, wyniki
 js/data/countries.js  wspólne dane krajów (kod, nazwa, stolica, region)
+js/data/shapes.js     kontury, mini-mapa i sąsiedztwa (generowane — patrz niżej)
+js/modules/country-shared.js  wspólne opcje i pytania modułów o państwa
 js/modules/flags.js   moduł „Flagi świata”
+js/modules/shapes.js  moduł „Kontury państw”
 js/modules/upcoming.js zapowiedzi kolejnych modułów
 ```
 
@@ -50,4 +57,20 @@ js/modules/upcoming.js zapowiedzi kolejnych modułów
 3. Usuń zapowiedź z `js/modules/upcoming.js`.
 
 Moduł dostarcza tylko pulę pytań, generowanie odpowiedzi i wygląd pytania —
-tryby gry, punkty, rekordy i ekran wyników daje silnik.
+tryby gry, punkty, rekordy i ekran wyników daje silnik. Moduły, w których odpowiedzią
+jest państwo, mogą użyć gotowych opcji i pytań z `js/modules/country-shared.js`.
+
+## Dane konturów (`tools/`)
+
+`js/data/shapes.js` jest generowany jednorazowo z [Natural Earth](https://www.naturalearthdata.com/)
+(1:50m, public domain, przez paczkę `world-atlas`) i commitowany — gra nie potrzebuje do tego niczego w runtime.
+
+```
+cd tools
+npm install
+node build-shapes.mjs
+```
+
+Skrypt rzutuje każdy kraj osobno (bez zniekształceń, także przez antypołudnik), odrzuca odległe terytoria
+(np. Gujanę Francuską, Hawaje, Svalbard), upraszcza ścieżki i pomija państwa mniejsze niż 2000 km².
+Po zmianach obejrzyj `tools/preview.html` — arkusz kontrolny wszystkich konturów.

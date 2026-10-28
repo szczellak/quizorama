@@ -409,8 +409,54 @@ button.module-card:hover { transform: translateY(-2px); border-color: var(--acce
   animation: flag-in .4s ease both;
 }
 
+.shape-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(150px, 30vh, 240px);
+  padding: 8px;
+}
+.shape-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 8px 16px color-mix(in srgb, var(--accent) 30%, transparent));
+  animation: flag-in .4s ease both;
+}
+.shape-path {
+  fill: color-mix(in srgb, var(--accent) 82%, var(--surface));
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.locator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: clamp(110px, 30%, 170px);
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.locator-land { fill: color-mix(in srgb, var(--muted) 35%, var(--surface)); }
+.locator-dot { fill: var(--bad); stroke: var(--surface); stroke-width: 1.5; }
+.locator-ring {
+  fill: none;
+  stroke: var(--bad);
+  stroke-width: 2.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: locator-pulse 1.6s ease-out infinite;
+}
+
 .points-pop {
   position: absolute;
+  z-index: 2;
   top: 8px;
   right: 8px;
   padding: 4px 12px;
@@ -579,6 +625,47 @@ button.module-card:hover { transform: translateY(-2px); border-color: var(--acce
 .feedback.is-bad .feedback-title { color: var(--bad); }
 .feedback-detail { font-size: 14px; color: var(--muted); }
 
+/* Okienko z ciekawostką (stolicą) na środku obrazka pytania */
+.fact-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.fact-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: 90%;
+  padding: 14px 28px;
+  border: 2px solid var(--good);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .35);
+  text-align: center;
+  animation: fact-pop var(--life, 1100ms) ease forwards;
+}
+.fact-card.is-bad { border-color: var(--bad); }
+.fact-answer { margin-bottom: 4px; font-size: 18px; font-weight: 900; color: var(--bad); }
+.fact-label { font-size: 14px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.fact-value { font-size: 32px; font-weight: 900; line-height: 1.15; color: var(--text); }
+.fact-note { font-size: 13px; font-weight: 700; color: var(--muted); }
+
+@keyframes fact-pop {
+  0% { opacity: 0; transform: scale(.85); }
+  12% { opacity: 1; transform: scale(1.03); }
+  20% { transform: scale(1); }
+  88% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(.97); }
+}
+
+.review-fact { font-size: 14px; color: var(--muted); }
+.review-fact strong { color: var(--text); }
+
 /* --- Wyniki --- */
 
 .results-hero { padding: 16px 0 24px; text-align: center; }
@@ -641,6 +728,8 @@ button.module-card:hover { transform: translateY(-2px); border-color: var(--acce
   filter: drop-shadow(0 0 1px rgba(0, 0, 0, .4));
 }
 
+.thumb-shape { flex-shrink: 0; width: 56px; height: 40px; }
+
 .perfect { text-align: center; font-size: 20px; font-weight: 900; color: var(--good); }
 
 /* --- Animacje --- */
@@ -658,6 +747,10 @@ button.module-card:hover { transform: translateY(-2px); border-color: var(--acce
   20% { opacity: 1; transform: translateY(0) scale(1.05); }
   80% { opacity: 1; }
   100% { opacity: 0; transform: translateY(-24px); }
+}
+@keyframes locator-pulse {
+  from { opacity: 1; transform: scale(.4); }
+  to { opacity: 0; transform: scale(1.6); }
 }
 @keyframes heart-lost { 0% { transform: scale(1.4); color: var(--bad); } }
 
@@ -677,6 +770,8 @@ button.module-card:hover { transform: translateY(-2px); border-color: var(--acce
   #app { padding-top: 16px; }
   .options { grid-template-columns: 1fr; }
   .option { min-height: 54px; }
+  .fact-value { font-size: 26px; }
+  .fact-card { padding: 12px 20px; }
   .slot { width: 20px; }
   .tile { width: 38px; height: 44px; font-size: 18px; }
   .tiles { gap: 6px; }

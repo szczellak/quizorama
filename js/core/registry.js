@@ -15,8 +15,10 @@
    *   answerInput?(settings)  -> 'choice' (domyślnie) | 'letters'
    *   getPool(settings)       -> elementy, z których losowane są pytania
    *   makeQuestion(item, settings) ->
-   *     wybór:  { id, answer, detail?, options: [{ id, label }], correctId }
-   *     litery: { id, answer, detail? }   // kafelki silnik tworzy z liter `answer`
+   *     wybór:  { id, answer, detail?, fact?, options: [{ id, label }], correctId }
+   *     litery: { id, answer, detail?, fact? }   // kafelki silnik tworzy z liter `answer`
+   *     fact: { icon?, label, value, note? } — wyróżniona informacja po odpowiedzi i na liście błędów
+   *           (np. { icon: '🏛️', label: 'Stolica', value: 'Warszawa', note: 'Europa' })
    *   renderPrompt(question)  -> węzeł DOM z treścią pytania
    *   renderThumb(id)         -> mały węzeł DOM do listy błędów
    *   preload?(item)          -> opcjonalne wczytanie zasobów następnego pytania
