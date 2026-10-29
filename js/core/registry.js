@@ -11,6 +11,7 @@
    *   emptyPoolText,               // komunikat, gdy pula pytań jest pusta
    *   reviewHint,                  // podpowiedź pod listą błędów na ekranie wyników
    *   lettersPromptLabel?,         // pytanie przy układaniu odpowiedzi z liter
+   *                                // (obie etykiety mogą być też funkcją settings -> tekst)
    *   options: [{ key, label, default, when?(settings), choices: [{ value, label, hint? }] }],
    *   answerInput?(settings)  -> 'choice' (domyślnie) | 'letters'
    *   getPool(settings)       -> elementy, z których losowane są pytania

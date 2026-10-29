@@ -3,7 +3,8 @@
 Przeglądarkowa aplikacja z quizami o świecie, budowana z niezależnych modułów.
 Moduły:
 - **Flagi świata** — rozpoznaj kraj po fladze,
-- **Kontury państw** — rozpoznaj kraj po kształcie granic.
+- **Kontury państw** — rozpoznaj kraj po kształcie granic,
+- **Stolice** — dopasuj stolicę do kraju (lub odwrotnie).
 
 ## Uruchomienie
 
@@ -19,13 +20,15 @@ Obrazki flag są pobierane z [flagcdn.com](https://flagcdn.com), więc potrzebny
 - W trybach Klasyczny i Przetrwanie można wyłączyć **odliczanie czasu** (bez premii za szybkość, osobne rekordy).
 - 2 sposoby odpowiedzi:
   - **4 odpowiedzi** — wybór z listy,
-  - **Układanie z liter** — nazwę kraju układa się z rozsypanych liter (z kilkoma literami-pułapkami),
+  - **Układanie z liter** — odpowiedź (nazwę kraju lub stolicy) układa się z rozsypanych liter (z kilkoma literami-pułapkami),
     klikając je lub pisząc na klawiaturze (`Backspace` cofa). Dwa razy więcej czasu.
     Za zdobyte punkty można odkrywać losowe litery (30 pkt za literę, ostatnią trzeba odgadnąć samodzielnie).
 - Punktacja: 100 pkt (układanie z liter: 200 pkt) + do 50 pkt za szybkość, mnożnik za serię trafień (do ×1,9).
 - Flagi: 197 państw, filtr regionu, poziom łatwy / trudny (trudny = podobne flagi i sąsiedzi).
 - Kontury: 170 państw (mikropaństwa i rozproszone archipelagi są pominięte), poziom łatwy = kontur + mini-mapa
   świata z zaznaczonym położeniem, trudny = sam kontur, a odpowiedzi to sąsiedzi kraju.
+- Stolice: 197 państw, kierunek kraj → stolica (z flagą) albo stolica → kraj,
+  poziom trudny = stolice sąsiadów i krajów z regionu.
 - Pula **„Moje błędy”** (osobna w każdym module): pomylone kraje wracają do powtórki, trafienia zdejmują je z listy.
 - Rekordy dla każdej kombinacji ustawień i statystyki zapisywane w `localStorage`.
 - Sterowanie klawiaturą: `1`–`4` wybór odpowiedzi, `Enter` dalej, `Esc` wyjście.
@@ -46,6 +49,7 @@ js/data/shapes.js     kontury, mini-mapa i sąsiedztwa (generowane — patrz ni�
 js/modules/country-shared.js  wspólne opcje i pytania modułów o państwa
 js/modules/flags.js   moduł „Flagi świata”
 js/modules/shapes.js  moduł „Kontury państw”
+js/modules/capitals.js moduł „Stolice”
 js/modules/upcoming.js zapowiedzi kolejnych modułów
 ```
 

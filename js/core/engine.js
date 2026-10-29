@@ -103,8 +103,9 @@
     const promptEl = h('div', { class: 'prompt' });
     const answerEl = h('div', { class: 'answer' });
     const feedbackEl = h('div', { class: 'feedback', 'aria-live': 'polite' });
+    const label = input === 'letters' ? module.lettersPromptLabel || module.promptLabel : module.promptLabel;
     const questionEl = h('section', { class: 'question' },
-      h('p', { class: 'question-label' }, input === 'letters' ? module.lettersPromptLabel || module.promptLabel : module.promptLabel),
+      h('p', { class: 'question-label' }, typeof label === 'function' ? label(settings) : label),
       promptEl, answerEl, feedbackEl);
 
     root.replaceChildren(h('div', { class: 'screen game', style: { '--accent': module.accent } },
@@ -443,7 +444,7 @@
       const { fact } = question;
       promptEl.appendChild(h('div', { class: 'fact-layer', 'aria-hidden': 'true' },
         h('div', { class: `fact-card ${ok ? 'is-good' : 'is-bad'}`, style: { '--life': `${duration}ms` } },
-          ok ? null : h('span', { class: 'fact-answer' }, question.answer),
+          ok || fact.value === question.answer ? null : h('span', { class: 'fact-answer' }, question.answer),
           h('span', { class: 'fact-label' }, `${fact.icon || ''} ${fact.label}`.trim()),
           h('strong', { class: 'fact-value' }, fact.value),
           fact.note ? h('span', { class: 'fact-note' }, fact.note) : null)));

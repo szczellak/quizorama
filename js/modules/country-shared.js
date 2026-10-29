@@ -6,16 +6,16 @@
   const { countries, regions } = Q.data;
   const byCode = new Map(countries.map((c) => [c.code, c]));
 
-  const answerOption = () => ({
+  const answerOption = ({ pick = 'właściwy kraj', word = 'nazwę kraju' } = {}) => ({
     key: 'answer',
     label: 'Sposób odpowiedzi',
     default: 'choice',
     choices: [
-      { value: 'choice', label: '4 odpowiedzi', hint: 'Wybierz właściwy kraj spośród czterech nazw.' },
+      { value: 'choice', label: '4 odpowiedzi', hint: `Wybierz ${pick} spośród czterech nazw.` },
       {
         value: 'letters',
         label: 'Układanie z liter',
-        hint: `Klikaj rozsypane litery (lub pisz na klawiaturze), by ułożyć nazwę kraju — uwaga na litery-pułapki. Za zdobyte punkty odkryjesz losowe litery (${Q.engine.LETTER_COST} pkt za literę).`,
+        hint: `Klikaj rozsypane litery (lub pisz na klawiaturze), by ułożyć ${word} — uwaga na litery-pułapki. Za zdobyte punkty odkryjesz losowe litery (${Q.engine.LETTER_COST} pkt za literę).`,
       },
     ],
   });

@@ -3,7 +3,6 @@
 
   // Zapowiedzi kolejnych modułów. Zamień wpis na pełny moduł (patrz js/modules/flags.js), gdy będzie gotowy.
   const upcoming = [
-    { id: 'capitals', name: 'Stolice', tagline: 'Dopasuj stolicę do państwa', icon: '🏛️' },
     { id: 'currencies', name: 'Waluty', tagline: 'Jaka waluta obowiązuje w danym kraju?', icon: '💰' },
   ];
 
